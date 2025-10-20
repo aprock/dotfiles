@@ -1,0 +1,83 @@
+#!/usr/bin/env sh
+
+# for this to work you must configure sudo such that
+# it will be able to run the command without password
+
+# After each yabai update you have to manually change
+# the hash in /private/etc/sudoers.d/yabai with
+# sudo visudo -f /private/etc/sudoers.d/yabai and
+# getting the hash with the command:
+# shasum -a 256 $(which yabai)
+
+yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+sudo yabai --load-sa
+
+# sketchy bar
+# yabai -m config external_bar all:30:0
+
+# Ghostty has known compatibility issues with macOS tiling window managers like Yabai.
+# The problem stems from Ghostty's use of macOS native tabs, which are represented as
+# separate windows in the macOS window manager API. This causes Yabai to treat each
+# Ghostty tab as an individual window, disrupting the expected tiling behavior.
+yabai -m rule --add app="Ghostty" subrole="AXFloatingWindow" manage=off
+yabai -m signal --add app='^Ghostty$' event=window_created action='yabai -m space --layout bsp'
+yabai -m signal --add app='^Ghostty$' event=window_destroyed action='yabai -m space --layout bsp'
+
+# global settings
+# yabai -m config mouse_follows_focus off
+yabai -m config focus_follows_mouse off
+# yabai -m config focus_follows_mouse autofocus
+# yabai -m config focus_follows_mouse autoraise
+yabai -m config window_origin_display default
+yabai -m config window_placement second_child
+yabai -m config window_topmost off
+yabai -m config window_shadow on
+yabai -m config window_opacity off
+yabai -m config window_opacity_duration 0.0
+yabai -m config active_window_opacity 1.0
+yabai -m config normal_window_opacity 0.90
+yabai -m config window_border off
+yabai -m config window_border_width 6
+yabai -m config active_window_border_color 0xff775759
+yabai -m config normal_window_border_color 0xff555555
+yabai -m config insert_feedback_color 0xffd75f5f
+yabai -m config split_ratio 0.50
+yabai -m config auto_balance off
+yabai -m config mouse_modifier fn
+yabai -m config mouse_action1 move
+yabai -m config mouse_action2 resize
+yabai -m config mouse_drop_action swap
+
+# general space settings
+yabai -m config layout bsp
+yabai -m config top_padding 15
+yabai -m config bottom_padding 15
+yabai -m config left_padding 15
+# NOTE: for OBS floating head
+# yabai -m config left_padding                 450
+yabai -m config right_padding 15
+yabai -m config window_gap 15
+
+yabai -m config mouse_modifier cmd
+yabai -m config mouse_action1 move
+yabai -m config mouse_action2 resize
+
+# apps to not manage (ignore)
+yabai -m rule --add app="^BitWarden$" manage=off
+yabai -m rule --add app="^Activity Monitor$" manage=off
+yabai -m rule --add app="^Alfred Preferences$" manage=off
+yabai -m rule --add app="^Archive Utility$" manage=off
+yabai -m rule --add app="^Disk Utility$" manage=off
+yabai -m rule --add app="^Docker Desktop$" manage=off
+yabai -m rule --add app="^Finder$" manage=off
+yabai -m rule --add app="^System Settings$" manage=off
+yabai -m rule --add app="^SpaceLauncher$" manage=off
+yabai -m rule --add app="^zoom.us$" sticky=on layer=above manage=off
+yabai -m rule --add app="^Google Meet$" manage=off
+yabai -m rule --add app="^Google Chrome$" manage=off
+yabai -m rule --add app="^kitty$" manage=on
+yabai -m rule --add app="^Grok$" manage=on border=off
+
+borders active_color=0xff80CBC4 inactive_color=0x00000000 width=5.0 &
+
+echo "yabai configuration loaded.."
